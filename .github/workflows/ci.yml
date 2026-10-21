@@ -1,0 +1,16 @@
+name: CI
+on:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  tests:
+    name: Tests
+    runs-on: ${{ fromJSON(inputs.runner || '["self-hosted","no-such-label"]') }}
+    steps:
+      - run: echo "DEFINITION=MAIN-V1 GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
+  typecheck:
+    name: TypeScript
+    runs-on: ${{ fromJSON(inputs.runner || '["self-hosted","no-such-label"]') }}
+    steps:
+      - run: echo "DEFINITION=MAIN-V1 GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
