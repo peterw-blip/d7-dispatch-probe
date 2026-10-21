@@ -1,16 +1,32 @@
 name: CI
 on:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: runs-on JSON array
+        default: '["ubuntu-latest"]'
+      expected_sha:
+        description: 40-hex head sha
+        required: true
 permissions:
   contents: read
 jobs:
   tests:
     name: Tests
     runs-on: ${{ fromJSON(inputs.runner || '["self-hosted","no-such-label"]') }}
+    env:
+      EXPECTED: ${{ inputs.expected_sha }}
     steps:
-      - run: echo "DEFINITION=MAIN-V1 GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
+      - run: |
+          echo "DEFINITION=PR-BRANCH GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then test "$GITHUB_SHA" = "$EXPECTED"; fi
   typecheck:
     name: TypeScript
     runs-on: ${{ fromJSON(inputs.runner || '["self-hosted","no-such-label"]') }}
+    env:
+      EXPECTED: ${{ inputs.expected_sha }}
     steps:
-      - run: echo "DEFINITION=MAIN-V1 GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
+      - run: |
+          echo "DEFINITION=PR-BRANCH GITHUB_SHA=$GITHUB_SHA EVENT=$GITHUB_EVENT_NAME"
+          if [ "$GITHUB_EVENT_NAME" = workflow_dispatch ]; then test "$GITHUB_SHA" = "$EXPECTED"; fi
